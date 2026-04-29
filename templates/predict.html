@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Prediction | ChurnGuard AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --dark: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .prediction-container {
+            padding-top: 100px;
+            padding-bottom: 50px;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .form-control, .form-select {
+            background-color: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(15, 23, 42, 0.8);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        }
+
+        .btn-predict {
+            background: linear-gradient(to right, #4361ee, #4cc9f0);
+            border: none;
+            padding: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .result-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .risk-high { color: #f87171; }
+        .risk-medium { color: #fbbf24; }
+        .risk-low { color: #4ade80; }
+
+        .probability-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 8px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .probability-value {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        /* Spinner */
+        .loader {
+            display: none;
+            width: 48px;
+            height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/"><i class="fas fa-shield-halved me-2"></i>ChurnGuard AI</a>
+            <div class="ms-auto">
+                <a href="/" class="btn btn-outline-light btn-sm">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container prediction-container">
+        <div class="row g-5">
+            <!-- Form Section -->
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="form-card">
+                    <h2 class="mb-4 fw-bold">Customer Profile</h2>
+                    <form action="/predict" method="POST" id="predictionForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tenure (Months)</label>
+                                <input type="number" name="tenure" class="form-control" placeholder="e.g. 12" required value="{{ input_data.tenure if input_data else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Monthly Charges (₹)</label>
+                                <input type="number" step="0.01" name="monthly_charges" class="form-control" placeholder="e.g. 70.00" required value="{{ input_data.monthly_charges if input_data else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Total Charges (₹)</label>
+                                <input type="number" step="0.01" name="total_charges" class="form-control" placeholder="e.g. 840.00" required value="{{ input_data.total_charges if input_data else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Customer Support Calls</label>
+                                <input type="number" name="customer_support_calls" class="form-control" placeholder="0-9" required value="{{ input_data.customer_support_calls if input_data else '' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Contract Type</label>
+                                <select name="contract_type" class="form-select" required>
+                                    <option value="Month-to-month" {{ 'selected' if input_data and input_data.contract_type == 'Month-to-month' }}>Month-to-month</option>
+                                    <option value="One year" {{ 'selected' if input_data and input_data.contract_type == 'One year' }}>One year</option>
+                                    <option value="Two year" {{ 'selected' if input_data and input_data.contract_type == 'Two year' }}>Two year</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Internet Service</label>
+                                <select name="internet_service" class="form-select" required>
+                                    <option value="Fiber optic" {{ 'selected' if input_data and input_data.internet_service == 'Fiber optic' }}>Fiber optic</option>
+                                    <option value="DSL" {{ 'selected' if input_data and input_data.internet_service == 'DSL' }}>DSL</option>
+                                    <option value="No" {{ 'selected' if input_data and input_data.internet_service == 'No' }}>No Service</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Payment Method</label>
+                                <select name="payment_method" class="form-select" required>
+                                    <option value="Electronic check" {{ 'selected' if input_data and input_data.payment_method == 'Electronic check' }}>Electronic check</option>
+                                    <option value="Mailed check" {{ 'selected' if input_data and input_data.payment_method == 'Mailed check' }}>Mailed check</option>
+                                    <option value="Bank transfer (automatic)" {{ 'selected' if input_data and input_data.payment_method == 'Bank transfer (automatic)' }}>Bank transfer</option>
+                                    <option value="Credit card (automatic)" {{ 'selected' if input_data and input_data.payment_method == 'Credit card (automatic)' }}>Credit card</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-predict w-100" id="submitBtn">
+                            <span class="btn-text">Analyze Customer Risk</span>
+                            <span class="loader mx-auto" id="loader"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="col-lg-5" data-aos="fade-left">
+                <div class="result-card h-100">
+                    {% if result %}
+                        <div class="animate__animated animate__fadeIn">
+                            <h3 class="mb-4">Analysis Result</h3>
+                            
+                            <div class="probability-circle mx-auto" style="border-color: {{ '#f87171' if result.risk_category == 'High Risk' else '#4ade80' if result.risk_category == 'Low Risk' else '#fbbf24' }}">
+                                <span class="probability-value">{{ result.probability }}%</span>
+                                <span class="text-secondary small">Probability</span>
+                            </div>
+
+                            <h2 class="fw-bold mb-2 {{ 'risk-high' if result.prediction == 'Churn' else 'risk-low' }}">
+                                {{ 'High Churn Risk' if result.prediction == 'Churn' else 'Safe (No Churn)' }}
+                            </h2>
+                            
+                            <p class="badge rounded-pill px-4 py-2 mt-3 fs-6 {{ 'bg-danger' if result.risk_category == 'High Risk' else 'bg-success' if result.risk_category == 'Low Risk' else 'bg-warning text-dark' }}">
+                                {{ result.risk_category }}
+                            </p>
+
+                            <p class="mt-4 text-secondary">
+                                This customer has a <strong>{{ result.probability }}%</strong> likelihood of churning based on the input features.
+                            </p>
+
+                            <a href="/predict" class="btn btn-sm btn-outline-secondary mt-3">Reset Form</a>
+                        </div>
+                    {% else %}
+                        <div class="text-center opacity-50">
+                            <i class="fas fa-microchip fa-4x mb-4 text-primary"></i>
+                            <h4>Ready for Analysis</h4>
+                            <p>Fill out the customer profile form to generate a churn prediction.</p>
+                        </div>
+                    {% endif %}
+
+                    {% if error %}
+                        <div class="alert alert-danger mt-4 w-100">
+                            <i class="fas fa-exclamation-triangle me-2"></i> {{ error }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000 });
+
+        document.getElementById('predictionForm').addEventListener('submit', function() {
+            const btnText = this.querySelector('.btn-text');
+            const loader = this.querySelector('#loader');
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+            document.getElementById('submitBtn').disabled = true;
+        });
+    </script>
+</body>
+</html>
