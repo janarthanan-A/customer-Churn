@@ -16,38 +16,45 @@
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
-            --dark: #212529;
-            --light: #f8f9fa;
             --accent: #4cc9f0;
-            --success: #4ade80;
-            --danger: #f87171;
+            --success: #16a34a;
+            --danger: #dc2626;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f1f5f9;
+            background-color: #f0f4ff;
+            color: #1e293b;
             overflow-x: hidden;
         }
 
         .navbar {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 2px 12px rgba(67, 97, 238, 0.07);
+        }
+
+        .navbar-brand, .nav-link {
+            color: #1e293b !important;
         }
 
         .hero-section {
             padding: 120px 0 80px;
-            background: radial-gradient(circle at top right, rgba(67, 97, 238, 0.1), transparent);
+            background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 100%);
         }
 
         .hero-title {
             font-size: 3.5rem;
             font-weight: 800;
-            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            background: linear-gradient(to right, #4361ee, #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
+        }
+
+        .hero-subtitle {
+            color: #475569;
         }
 
         .btn-primary {
@@ -56,45 +63,65 @@
             padding: 12px 30px;
             border-radius: 8px;
             font-weight: 600;
+            color: #fff;
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             background-color: var(--secondary);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.25);
+            color: #fff;
+        }
+
+        .btn-outline-dark {
+            border: 2px solid #1e293b;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-dark:hover {
+            background-color: #1e293b;
+            color: #fff;
+            transform: translateY(-2px);
         }
 
         .card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
-            color: white;
-            transition: transform 0.3s ease;
+            color: #1e293b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 16px rgba(67, 97, 238, 0.07);
         }
 
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(67, 97, 238, 0.15);
         }
 
         .feature-icon {
             font-size: 2rem;
-            color: var(--accent);
+            color: var(--primary);
             margin-bottom: 1.5rem;
         }
 
         .chart-container {
-            padding: 20px;
-            background: rgba(30, 41, 59, 0.5);
+            padding: 24px;
+            background: #ffffff;
             border-radius: 16px;
             margin-top: 2rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 16px rgba(67, 97, 238, 0.07);
         }
 
         .section-title {
             text-align: center;
             margin-bottom: 3rem;
             position: relative;
+            color: #1e293b;
         }
 
         .section-title::after {
@@ -107,24 +134,34 @@
             border-radius: 2px;
         }
 
+        .text-secondary {
+            color: #64748b !important;
+        }
+
         canvas {
             max-width: 100%;
         }
 
         footer {
             padding: 40px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid #e2e8f0;
             margin-top: 80px;
+            background: #ffffff;
+            color: #64748b;
+        }
+
+        section.bg-darker {
+            background: #eef2ff !important;
         }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/"><i class="fas fa-shield-halved me-2"></i>ChurnGuard AI</a>
+            <a class="navbar-brand fw-bold" href="/" style="color:#4361ee;"><i class="fas fa-shield-halved me-2"></i>ChurnGuard AI</a>
             <div class="ms-auto">
-                <a href="/predict" class="btn btn-outline-light btn-sm">Try Prediction</a>
+                <a href="/predict" class="btn btn-primary btn-sm">Try Prediction</a>
             </div>
         </div>
     </nav>
@@ -134,10 +171,10 @@
             <div class="row align-items-center">
                 <div class="col-lg-6" data-aos="fade-right">
                     <h1 class="hero-title">Predict Customer Churn with Ensemble AI</h1>
-                    <p class="lead text-secondary mb-4">Leverage high-performance Machine Learning to identify at-risk customers before they leave. Built with an ensemble of industry-leading algorithms.</p>
+                    <p class="lead hero-subtitle mb-4">Leverage high-performance Machine Learning to identify at-risk customers before they leave. Built with an ensemble of industry-leading algorithms.</p>
                     <div class="d-flex gap-3">
                         <a href="/predict" class="btn btn-primary btn-lg">Start Prediction</a>
-                        <a href="#analytics" class="btn btn-outline-light btn-lg">View Model Metrics</a>
+                        <a href="#analytics" class="btn btn-outline-dark btn-lg">View Model Metrics</a>
                     </div>
                 </div>
                 <div class="col-lg-6" data-aos="zoom-in">
@@ -228,16 +265,16 @@
                         y: {
                             beginAtZero: true,
                             max: 100,
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            ticks: { color: '#94a3b8' }
+                            grid: { color: 'rgba(0, 0, 0, 0.06)' },
+                            ticks: { color: '#475569' }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#94a3b8' }
+                            ticks: { color: '#475569' }
                         }
                     },
                     plugins: {
-                        legend: { labels: { color: '#f1f5f9' } }
+                        legend: { labels: { color: '#1e293b' } }
                     }
                 };
 
